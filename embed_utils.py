@@ -76,19 +76,33 @@ def truncate_basis(mol, mask):
     """Truncate the molecule basis set according to the shell mask"""
     print(' Making Truncated Basis Set')
     trunc_basis = deepcopy(mol._basis)
+    trunc_basis1 = deepcopy(mol._basis)
+    #print(trunc_basis)
     for i_atom in range(mol.natm):
         symbol = mol.atom_symbol(i_atom)
         shell_ids = mol.atom_shell_ids(i_atom)
-
+        #print(symbol, shell_ids, mask )
         # keep only the AOs in shells that were not screened
-        trunc_basis[symbol] = \
-            [trunc_basis[symbol][i] for i, shell in enumerate(shell_ids) if mask[shell]]
+
+        filtered = []
+        #print(symbol,trunc_basis1[symbol],"Sahil")
+        for i, shell in enumerate(shell_ids):
+            #print(i,shell,trunc_basis[symbol][i])
+            if mask[shell]:
+                #print(i,trunc_basis[symbol][i])
+                filtered.append(trunc_basis[symbol][i])
+        trunc_basis1[symbol] = filtered
+
+
+        #trunc_basis[symbol] = \
+        #    [trunc_basis[symbol][i] for i, shell in enumerate(shell_ids) if mask[shell]]
         print(symbol, shell_ids, [mask[shell] for shell in shell_ids])
 
-        if trunc_basis[symbol] == []: # if all AOs on an atom are gone, remove it
-            del trunc_basis[symbol]
+        if trunc_basis1[symbol] == []: # if all AOs on an atom are gone, remove it
+            del trunc_basis1[symbol]
 
-    return trunc_basis
+    #print(trunc_basis1)
+    return trunc_basis1
 
 def purify(matrix, overlap, rtol=1e-5, atol=1e-8, max_iter=15):
     """McWeeny Purification of Density Matrix"""
