@@ -10,6 +10,7 @@ from projectorEmbedding.embed_utils import purify
 from projectorEmbedding.embed_utils import screen_aos
 from projectorEmbedding.embed_utils import truncate_basis
 from projectorEmbedding.embed_partition import mulliken_partition as pmm
+from projectorEmbedding.embed_partition import spade_partition as spade
 from projectorEmbedding.embed_pyscf_replacements import energy_elec
 
 def embedding_procedure(init_mf, active_atoms=None, embed_meth=None,
@@ -37,6 +38,7 @@ def embedding_procedure(init_mf, active_atoms=None, embed_meth=None,
         results: A tuple containing the total embedded energy.
     """
     print("Start Projector Embedding")
+    #print(active_atoms)
 
     # restricted open-shell not supported
     if isinstance(init_mf, scf.rohf.ROHF) or isinstance(init_mf, dft.roks.ROKS):
@@ -53,6 +55,7 @@ def embedding_procedure(init_mf, active_atoms=None, embed_meth=None,
     # get active mos
     print("Partitioning MOs")
     c_occ_a, _ = distribute_mos(init_mf, active_atoms=active_atoms, c_occ=c_occ)
+    #print(c_occ_a[0].shape)
     if init_is_unrestricted: 
         print(f"Number of active MOs: {c_occ_a[0].shape[1]}, {c_occ_a[1].shape[1]}")
     else:
@@ -184,6 +187,12 @@ def embedding_procedure(init_mf, active_atoms=None, embed_meth=None,
     # recombined energy with embedded part
     results = (init_mf.e_tot - energy_a + energy_a_in_b, )
 
+    #norb_alpha = mf_embed.mo_coeff[0].shape[1]
+    #norb_beta = mf_embed.mo_coeff[1].shape[1]
+    #total_orbitals = norb_alpha + norb_beta
+
+    #print(f"Total number of orbitals: {total_orbitals}")
+    print(hcore_a_in_b.shape)
     # correlated WF methods
     if 'mp2' in embed_meth:
         embed_corr = mp.MP2(mf_embed)
