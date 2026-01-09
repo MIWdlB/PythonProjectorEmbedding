@@ -1,7 +1,6 @@
 import os
 import time
 
-from projectorEmbedding import *
 from pyscf import gto, scf
 
 start_time = time.time()
